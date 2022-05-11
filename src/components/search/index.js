@@ -3,7 +3,7 @@
 import React, { PropTypes } from 'react'
 import './search.css'
 
-const Search = ({ onHandleSearch, isDisabled }) => (
+const Search = ({ onHandleSearch, isDisabled, defaultValue = '' }) => (
 /*     <div className={style.search}> */
   <div className='search'>
     <input
@@ -11,6 +11,7 @@ const Search = ({ onHandleSearch, isDisabled }) => (
       placeholder='Nome do usuario '
       disabled={isDisabled}
       onKeyUp={onHandleSearch}
+      value= {defaultValue}
     />
   </div>
 )

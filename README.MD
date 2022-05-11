@@ -1,1 +1,3 @@
-OBSERVACOES D# githubapp
+rodar o server http
+
+http-server ./dist

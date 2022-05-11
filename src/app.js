@@ -4,29 +4,45 @@ import React, { Component } from 'react'
 import AppContent from 'components/app-content'
 import ajax from '@fdaciuk/ajax'
 
+const initialRepoState = {
+  repos:[],
+  pagination:{
+    total: 1,
+    activePage:1
+  }
+}
+
 class App extends Component {
   constructor () {
     super()
     this.state = {
-      userinfo: null,
-      repos: [],
-      starred: [],
-      isFetching: false,
-      isDisabled: false
+      userinfo: undefined,
+      repos: initialRepoState,
+      starred: initialRepoState,
+      isFetching: false
     }
-
+    this.perPage = 3
     this.onHandleSearch = this.handleSearch.bind(this)
-    //  this.handleRepos = this.handleRepos.bind(this )
   }
 
-  handleRepos (tipo) {
-    ajax().get(`https://api.github.com/users/${this.state.userinfo.login}/${tipo}`)
+  getGitHubApiUrl(type, page) {
+    const userName = this.state.userinfo ? `${this.state.userinfo.login}` : '' 
+    const internalType = type ?  `${type}` : '' 
+    return `https://api.github.com/users/${userName}/${internalType}?per_page=${this.perPage}&page=${page}`
+  }
+
+  getRepos (type, page = 1 ) {
+    console.log(type)
+    ajax().get( this.getGitHubApiUrl(type, page)) 
       .then(result => {
         this.setState({
-          [tipo]: result.map((it) => ({
-            link: `https://github.com/${it.full_name}`,
-            name: it.name
-          }))
+          [type]: { 
+            repos: result.map((repo) => ({
+              name: repo.name,
+              link: repo.html_url
+            })),
+            pagination: this.state[type].pagination
+          }
         })
       })
   }
@@ -35,7 +51,6 @@ class App extends Component {
     const keyCode = e.which || e.keyCode
     const ENTER = 13
     if (keyCode === ENTER) {
-      console.log(this)
       this.setState({ isFetching: true })
       ajax().get(`https://api.github.com/users/${e.target.value}`)
         .then(result => {
@@ -48,8 +63,8 @@ class App extends Component {
               following: result.following,
               login: result.login
             },
-            repos: [],
-            starred: []
+            repos: initialRepoState,
+            starred: initialRepoState
           })
         }).always(() => this.setState({ isFetching: false }))
     }
@@ -60,8 +75,9 @@ class App extends Component {
       <AppContent
         {...this.state}
         onHandleSearch={this.onHandleSearch}
-        onHandleRepos={(e) => this.handleRepos('repos')}
-        onHandleStarred={(e) => this.handleRepos('starred')}
+        onHandleRepos={(e) => this.getRepos('repos')}
+        onHandleStarred={(e) => this.getRepos('starred')}
+        handlePagination={ (type, page) => this.getRepos(type, page) } 
       />
     )
   }

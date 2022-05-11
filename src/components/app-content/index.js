@@ -15,37 +15,40 @@ const AppContent = ({
   onHandleRepos,
   onHandleStarred,
   isFetching,
-  isDisabled
+  handlePagination
 }) => (
   <div className='app'>
-    <Search onHandleSearch={onHandleSearch} isDisabled={isDisabled} />
-
+    <Search onHandleSearch={onHandleSearch} isDisabled={isFetching} defaultValue ={'walterfcarvalho'} />
     {isFetching && <div>Carregando...</div>}
-
     {!!userinfo && <UserInfo userinfo={userinfo} />}
-
     {!!userinfo && <Action handleRepo={onHandleRepos} handleStarred={onHandleStarred} />}
 
-    {!!repos.length && <Repos
-      className='repos'
-      title='Repositorios'
-      repos={repos}
-                       />}
+    <div>
+      {!!repos.repos.length && <Repos
+        className='repos'
+        title='Repositorios'
+        repos={repos}
+        handlePagination = {(clicked) => handlePagination('repos', clicked) }
+                        />}
 
-    {!!starred.length && <Repos
-      className='starred'
-      title='Favoritos'
-      repos={starred}
-                         />}
+      {!!starred.repos.length && <Repos
+        className='starred'
+        title='Favoritos'
+        repos={starred}
+        handlePagination = {(clicked) => handlePagination('starred', clicked) }
+                          />}
+    </div>
+
   </div>
 )
 
 AppContent.propTypes = {
   userinfo: PropTypes.object,
-  repos: PropTypes.array.isRequired,
-  starred: PropTypes.array.isRequired,
+  repos: PropTypes.object.isRequired,
+  starred: PropTypes.object.isRequired,
   onHandleSearch: PropTypes.func.isRequired,
   onHandleRepos: PropTypes.func.isRequired,
+  handlePagination: PropTypes.func.isRequired,
   onHandleStarred: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired
 }
